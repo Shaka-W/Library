@@ -19,41 +19,26 @@ function Book(title, author, pages, read) {
 
 function addBookToLibrary(book) {
     myLibrary.push(book);
-    displayBooks(myLibrary);
+    setBookValues(myLibrary);
 }
 
-function createBookRow(bookTitle, bookAuthor, bookPages, readBook) { 
-    const tr = document.createElement('tr');
+submitBtn.addEventListener('click', () => {
+    let bookRead = '';
 
-    let td1 = document.createElement('td');
-    let td2 = document.createElement('td');
-    let td3 = document.createElement('td');
-    let td4 = document.createElement('td');
-    let td5 = document.createElement('td');
+    for (let i = 0; i < radioBtn.length; i++) {
+        if (radioBtn[i].checked) {
+            bookRead = radioBtn[i].value;
+            break;
+        }       
+    }
+    
+    const book = new Book(bookName.value, authorName.value, numOfPages.value, bookRead);
+    addBookToLibrary(book);
 
-    let deleteBtn = document.createElement('i');
-    deleteBtn.classList.add('d-flex', 'justify-content-center', 'align-items-center', 'icon', 'fas', 'fa-trash');
+    form.reset();
+});
 
-    deleteBtn.addEventListener('click', (e) => {
-        e.target.parentNode.parentNode.remove();
-    });
-
-    td1.appendChild(bookTitle);
-    td2.appendChild(bookAuthor);
-    td3.appendChild(bookPages);
-    td4.appendChild(readBook);
-    td5.appendChild(deleteBtn)
- 
-    tr.appendChild(td1);
-    tr.appendChild(td2);
-    tr.appendChild(td3);
-    tr.appendChild(td4);
-    tr.appendChild(td5);
- 
-    tableBody.appendChild(tr);
-}
-
-function displayBooks(myLibrary) {
+function setBookValues(myLibrary) {
     let bookTitle;
     let bookAuthor;
     let bookPages;
@@ -66,24 +51,76 @@ function displayBooks(myLibrary) {
          readBook = document.createTextNode(book.read);
    });
 
-   createBookRow(bookTitle, bookAuthor, bookPages, readBook);
+   if (readBook.textContent === '') {
+       alert('Check one for read or not read!');
+       return
+   } 
 
-   form.reset();
+   createBookRow(bookTitle, bookAuthor, bookPages, readBook);
 }
 
-submitBtn.addEventListener('click', () => {
-    let bookRead;
+function createBookRow(bookTitle, bookAuthor, bookPages, readBook) { 
+    const tr = document.createElement('tr');
 
-    for (let i = 0; i < radioBtn.length; i++) {
-        if (radioBtn[i].checked) {
-            bookRead = radioBtn[i].value;
-            break;
-        } else if (radioBtn[i].value === undefined) {
-            alert('Check one for read or not read!');
-            return;
+    let td1 = document.createElement('td');
+    let td2 = document.createElement('td');
+    let td3 = document.createElement('td');
+    let td4 = document.createElement('td');
+    let td5 = document.createElement('td');
+
+    td1.appendChild(bookTitle);
+    td2.appendChild(bookAuthor);
+    td3.appendChild(bookPages);
+    td4.appendChild(readOrNotRead(readBook));
+    td5.appendChild(createDeleteButton())
+ 
+    tr.appendChild(td1);
+    tr.appendChild(td2);
+    tr.appendChild(td3);
+    tr.appendChild(td4);
+    tr.appendChild(td5);
+ 
+    tableBody.appendChild(tr);
+}
+
+function createDeleteButton() {
+    let deleteBtn = document.createElement('i');
+    deleteBtn.classList.add('d-flex', 'justify-content-center', 'align-items-center', 'icon', 'fas', 'fa-trash', 'fa-2x');
+
+    deleteBook(deleteBtn);
+    return deleteBtn
+}
+
+function deleteBook(deleteBtn) {
+    deleteBtn.addEventListener('click', (e) => {
+        e.target.parentNode.parentNode.remove();
+    });
+}
+
+function readOrNotRead(readBook) {
+    let readBtn = document.createElement('button');
+    
+    if (readBook.textContent === 'Yes') {
+        readBtn.innerHTML = 'Read';
+        readBtn.classList.add('btn', 'btn-success');
+    } else if (readBook.textContent === 'No') {
+        readBtn.innerHTML = 'Not Read';
+        readBtn.classList.add('btn', 'btn-danger');
+    } 
+
+    changeReadStatus(readBtn);
+    return readBtn;
+}
+
+function changeReadStatus(readBtn) {
+    readBtn.addEventListener('click', () => { 
+        if (readBtn.textContent === 'Read') {
+            readBtn.innerHTML = 'Not Read';
+            readBtn.classList.add('btn', 'btn-danger');
+        } else if (readBtn.textContent === 'Not Read') {
+            readBtn.innerHTML = 'Read';
+            readBtn.classList.remove('btn-danger');
+            readBtn.classList.add('btn-success');
         }
-    }
-
-    const book = new Book(bookName.value, authorName.value, numOfPages.value, bookRead);
-    addBookToLibrary(book);
-});
+    });
+}
